@@ -13,11 +13,14 @@
 
     <v-list dense>
       <div
-        v-for="list in lists"
+        v-for="list in lists(active_key)"
         :key="list.name"
       >
         <template v-if="list.data.length">
-          <v-subheader>{{list.name}}</v-subheader>
+          <v-subheader class="text-h6 mb-2">{{list.name}}<v-chip
+              small
+              class="ml-2"
+            >{{list.data.length}}</v-chip></v-subheader>
           <v-list-item
             v-for="(item, i) in list.data"
             :key="i"
@@ -32,7 +35,7 @@
               />
             </v-list-item-avatar>
             <v-list-item-content>
-              <v-list-item-title>{{item.title}}</v-list-item-title>
+              <v-list-item-title class="text-subtitle-1">{{item.title}}</v-list-item-title>
             </v-list-item-content>
             <v-list-item-action>
               <v-icon
@@ -49,31 +52,17 @@
 
 <script>
 import { uuid } from "vue-uuid";
+import mixin from "@/mixins/store";
+import moment from "moment";
 export default {
+  mixins: [mixin],
   data() {
     return {
-      // 当前完整列表
-      current_list: [],
       // 待办事项输入值
       todo: "",
       // 这里处理渲染的时候v-checkbox值变动样式不刷新的问题
       refresh: true,
     };
-  },
-  computed: {
-    // 为了能用v-for 渲染写的列表目录
-    lists() {
-      return [
-        {
-          name: "待办列表",
-          data: this.current_list.filter((list_item) => !list_item.complete),
-        },
-        {
-          name: "已完成",
-          data: this.current_list.filter((list_item) => list_item.complete),
-        },
-      ];
-    },
   },
   methods: {
     // 新增todolist
@@ -84,7 +73,8 @@ export default {
         id: uuid.v4(),
         title: this.todo,
         complete: false,
-        create_time: new Date(),
+        create_time: moment(new Date()).format("yyyy-MM-DD HH:mm:ss"),
+        category: "",
       });
       this.todo = "";
     },
@@ -107,9 +97,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-::v-deep .v-label {
-  left: -13px !important;
-}
 .task-item {
   background-color: #eee;
   border-radius: 10px;
