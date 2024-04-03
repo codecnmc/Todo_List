@@ -11,7 +11,7 @@
         <v-icon>mdi-close</v-icon>
       </v-system-bar>
       <!-- 这里使用我们自己封装的drawer 要根据页面宽度去解决侧边栏常驻 -->
-      <side-bar />
+      <left-bar />
       <v-main>
         <v-toolbar
           color="#3F51B5"
@@ -21,8 +21,9 @@
             @click="drawer=!drawer"
             class="d-sm-flex d-md-none"
           ></v-app-bar-nav-icon>
-          <v-toolbar-title>{{active_key}}</v-toolbar-title>
+          <v-toolbar-title>{{active_key&&active_key.name}}</v-toolbar-title>
           <v-spacer></v-spacer>
+
         </v-toolbar>
         <v-container>
           <task-list />
@@ -33,15 +34,15 @@
 </template>
 
 <script>
-import SideBar from "./components/SideBar.vue";
 import TaskList from "./components/TaskList.vue";
 import mixin from "@/mixins/store";
+import LeftBar from "./components/LeftBar.vue";
 export default {
   mixins: [mixin],
   name: "App",
   components: {
     TaskList,
-    SideBar,
+    LeftBar,
   },
 };
 </script>
@@ -57,5 +58,9 @@ export default {
 }
 .v-system-bar {
   z-index: 99;
+}
+.menu_item_label {
+  margin-left: 10px !important;
+  font-size: 16px;
 }
 </style>

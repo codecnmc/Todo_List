@@ -43,8 +43,9 @@ export default {
     },
     // 为了能用v-for 渲染写的列表目录 根据不同的key去获取它的待办列表和已完成列表
     lists() {
-      return (key) => {
-        switch (key) {
+      return (item) => {
+        if (!item) return [];
+        switch (item.name) {
           case "我的一天":
             let current_date = moment(new Date()).format("yyyy-MM-DD");
             return [
@@ -73,9 +74,27 @@ export default {
               },
             ];
           default:
-            break;
+            return [
+              {
+                name: "待办列表",
+                data: this.current_list.filter((list_item) => !list_item.complete && list_item.category == item.id),
+              },
+              {
+                name: "已完成",
+                data: this.current_list.filter((list_item) => list_item.complete && list_item.category == item.id),
+              },
+            ];
         }
       };
+    },
+    // 操作侧边栏的打开
+    edit_drawer: {
+      get() {
+        return this.$store.state.edit_drawer;
+      },
+      set(value) {
+        this.$store.commit("setEditDrawer", value);
+      },
     },
   },
 };

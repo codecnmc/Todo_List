@@ -7,49 +7,40 @@
     :class="{top:isAbsolute}"
     disable-resize-watcher
     mobile-breakpoint="0"
+    v-bind="$attrs"
+    :left="left"
+    :right="right"
   >
     <v-toolbar
       color="#fff"
       flat
-      v-if="isAbsolute"
+      v-if="isAbsolute&&!right"
     >
       <v-app-bar-nav-icon @click="drawer=!drawer"></v-app-bar-nav-icon>
     </v-toolbar>
-    <v-list class="pt-md-6">
-      <v-list-item
-        class="list-item text-h6"
-        v-for="item in menus"
-        :key="item"
-        :class="{'active':item==active_key}"
-        @click="changeKey(item)"
-      >
-        <v-list-item-content>
-          {{item}}
-        </v-list-item-content>
-        <v-list-item-action>
-          <v-chip
-            class="ml-4"
-            v-if="lists(item)[0].data.length"
-          >{{lists(item)[0].data.length}}</v-chip>
-        </v-list-item-action>
-      </v-list-item>
-      <v-divider></v-divider>
-    </v-list>
+    <slot></slot>
   </v-navigation-drawer>
 </template>
 
 <script>
-import mixin from "@/mixins/store";
 export default {
-  mixins: [mixin],
+  props: ["left", "right", "value"],
+  model: {
+    prop: "value",
+    event: "change",
+  },
   computed: {
     // 侧边栏是否是绝对布局
     isAbsolute() {
       return this.width <= 960;
     },
-    // 目录列表
-    menus() {
-      return this.fixed_menu.concat(this.sort_menu);
+    drawer: {
+      get() {
+        return this.value;
+      },
+      set(value) {
+        this.$emit("change", value);
+      },
     },
   },
   data() {
@@ -66,17 +57,13 @@ export default {
     // 监听窗口宽度变化
     responseWidth(event) {
       let width = window.innerWidth;
-      if (this.width != width && width > 960) {
+      if (this.width != width && width > 960 && !this.right) {
         this.drawer = true;
       }
-      this.width = width;
-    },
-    // 切换侧边栏选中项 如果小于960 代表是在移动端的情况下 要把侧边栏收起来
-    changeKey(key) {
-      this.active_key = key;
-      if (this.width < 960) {
+      if (this.width != width && width < 960 && this.right) {
         this.drawer = false;
       }
+      this.width = width;
     },
   },
   beforeDestroy() {
@@ -88,14 +75,5 @@ export default {
 <style lang="scss" scoped>
 .top {
   z-index: 100;
-}
-.list-item {
-  cursor: pointer;
-  &:hover {
-    background-color: #eee;
-  }
-  &.active {
-    background: #eee;
-  }
 }
 </style>
