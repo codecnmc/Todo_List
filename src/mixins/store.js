@@ -1,5 +1,12 @@
 import moment from "moment";
 export default {
+  data() {
+    return {
+      // 菜单选项
+      deadline_options: ["今天", "明天", "下周"],
+      repeat_options: ["每天", "工作日", "每周", "每月", "每年"],
+    };
+  },
   computed: {
     // 操作侧边栏的打开
     drawer: {
@@ -95,6 +102,53 @@ export default {
       set(value) {
         this.$store.commit("setEditDrawer", value);
       },
+    },
+    // 建议的侧边栏
+    suggest_drawer: {
+      get() {
+        return this.$store.state.suggest_drawer;
+      },
+      set(value) {
+        this.$store.commit("setSuggestDrawer", value);
+      },
+    },
+    // 编辑表单
+    form: {
+      get() {
+        return this.$store.state.form;
+      },
+      set(value) {
+        this.$store.commit("setForm", value);
+      },
+    },
+    dark: {
+      get() {
+        return this.$store.state.dark;
+      },
+      set(value) {
+        this.$store.commit("setDark", value);
+      },
+    },
+    // 可选菜单列表
+    sortOptions() {
+      let options = [{ label: "任务", value: -1, icon: "mdi-content-paste" }].concat(
+        this.sort_menu.map((item) => {
+          return {
+            label: item.name,
+            value: item.id,
+            icon: item.icon,
+          };
+        })
+      );
+      return options;
+    },
+    // 显示subtitle 所属分类用的字典 因为绑定的是id
+    menusMap() {
+      let map = {};
+      this.sortOptions.forEach((item) => {
+        map[item.value] = item.label;
+      });
+      return map;
     },
   },
 };

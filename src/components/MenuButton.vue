@@ -1,5 +1,8 @@
 <template>
-  <v-menu offset-y>
+  <v-menu
+    offset-y
+    :dark="dark"
+  >
     <template v-slot:activator="{attrs:toolAttr,on:toolOn}">
       <v-tooltip top>
         <template v-slot:activator="{ on, attrs }">
@@ -7,6 +10,7 @@
             v-bind="{...toolAttr,...attrs}"
             v-on="{...on,...toolOn}"
             text
+            dark
           >
             <v-icon left>
               {{icon}}
@@ -17,7 +21,10 @@
         <span>{{tips}}</span>
       </v-tooltip>
     </template>
-    <v-list dense>
+    <v-list
+      dense
+      :dark="dark"
+    >
       <v-list-item
         class="pr-10"
         v-for="(item, index) in options"
@@ -42,7 +49,7 @@
 
 <script>
 export default {
-  props: ["options", "icon", "tips", "value", "item_icon", "append"],
+  props: ["options", "icon", "tips", "value", "item_icon", "append", "dark"],
   model: {
     prop: "value",
     event: "input",

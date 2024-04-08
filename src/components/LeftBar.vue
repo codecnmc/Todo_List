@@ -1,9 +1,24 @@
 <template>
-  <side-bar v-model="drawer">
-    <v-list
-      class="pt-md-6"
-      v-if="active_key"
-    >
+  <side-bar
+    v-model="drawer"
+    :app="true"
+    #default="{isAbsolute}"
+  >
+    <v-app-bar-nav-icon
+      @click="drawer=!drawer"
+      v-if="isAbsolute"
+    ></v-app-bar-nav-icon>
+    <v-list v-if="active_key">
+      <v-list-item>
+        <v-list-item-avatar>
+          <v-img src="https://pic.imeitou.com/uploads/allimg/2019090208/j1lm1xn2ibf.jpg"></v-img>
+        </v-list-item-avatar>
+        <v-list-item-content>
+          <v-list-item-title class="text-h6">
+            羊驼
+          </v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
       <v-list-item
         class="list-item text-h6"
         v-for="(item,index) in menus"

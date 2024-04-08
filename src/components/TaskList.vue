@@ -1,5 +1,5 @@
 <template>
-  <div class="py-4">
+  <div class="py-4 pr-8 px-6">
     <v-text-field
       v-model="todo"
       placeholder="请输入待办事项"
@@ -8,12 +8,15 @@
       single-line
       persistent-placeholder
       dense
+      prepend-inner-icon="mdi-plus"
+      :dark="dark"
       clearable
+      class="todo"
       @keydown.enter="addTodo"
     >
     </v-text-field>
     <div v-if="todo&&todo.length">
-      <div class="mb-2">待办设置</div>
+      <div class="mb-2 title pl-2">待办设置</div>
       <div>
         <!-- 分类设置 -->
         <menu-button
@@ -22,6 +25,7 @@
           :options="sortOptions"
           tips="分类设置"
           v-if="active_key&&[1,2].includes(active_key.id)"
+          :dark="dark"
         />
         <!-- 截止日期设置 -->
         <menu-button
@@ -31,6 +35,7 @@
           item_icon="mdi-calendar-month"
           icon="mdi-calendar-month"
           append="删除截止日期"
+          :dark="dark"
         />
         <!-- 提醒日期 -->
         <menu-button
@@ -40,6 +45,7 @@
           item_icon="mdi-calendar-month"
           icon="mdi-clock-alert"
           append="删除提醒日期"
+          :dark="dark"
         />
         <!--  -->
         <menu-button
@@ -49,129 +55,56 @@
           item_icon="mdi-calendar-month"
           icon="mdi-calendar-refresh"
           append="从不重复"
+          :dark="dark"
         />
       </div>
     </div>
     <!-- 任务列表 -->
-    <v-list dense>
+    <v-list
+      dense
+      color="transparent"
+      :dark="dark"
+    >
       <div
         v-for="
           list
           in
-          lists(active_key)"
+          tasks"
         :key="list.name"
       >
         <template v-if="list.data.length">
-          <v-subheader class="text-h6 mb-2">{{list.name}}<v-chip
+          <v-subheader class="text-h6 mb-2 title">{{list.name}}<v-chip
               small
               class="ml-2"
             >{{list.data.length}}</v-chip></v-subheader>
-          <v-list-item
-            v-for="(item, i) in list.data"
-            :key="i"
-            class="task-item mb-4"
-            :class="{complete:item.complete}"
-            @contextmenu.prevent="(event)=>{onContextmenu(event,item)}"
-            @click="selectItem(item)"
-          >
-            <v-list-item-avatar>
-              <v-checkbox
-                v-model="item.complete"
-                @change="forceUpdate"
-                v-if="refresh"
-              />
-            </v-list-item-avatar>
-            <v-list-item-content>
-              <v-list-item-title class="text-subtitle-1">{{item.title}}</v-list-item-title>
-              <v-list-item-subtitle>{{menusMap[item.category]||'任务'}}</v-list-item-subtitle>
-            </v-list-item-content>
-            <v-list-item-action>
-              <v-icon
-                v-if="!item.complete"
-                @click="deleteItem(item.id)"
-              >mdi-close</v-icon>
-            </v-list-item-action>
-          </v-list-item>
+          <task-item
+            v-for="(item,index) in list.data"
+            :key="item.id"
+            v-model="list.data[index]"
+          />
         </template>
       </div>
     </v-list>
-    <!-- 编辑抽屉 -->
-    <side-bar
-      v-model="edit_drawer"
-      :right="true"
-      width="350px"
+    <div
+      v-if="isEmpty"
+      class="v-empty"
     >
-      <div class="d-flex justify-space-between mt-md-10 mt-sm-4 pl-4">
-        <span class="text-h6">事项编辑</span>
-        <v-btn
-          text
-          @click="edit_drawer=false"
-        > <v-icon>mdi-close</v-icon></v-btn>
-      </div>
-      <v-form
-        v-if="form"
-        class="px-6"
+      <v-card
+        max-width="344"
+        color="transparent"
+        flat
       >
-        <div class="d-flex align-center mb-4">
-          <v-checkbox v-model="form.complete" />
-          <v-text-field
-            v-model="form.title"
-            dense
-            hide-details
-            outlined
-            label="待办事项"
-            @focus="getCacheName"
-            @blur="checkName"
-          />
-        </div>
-        <v-select
-          v-model="form.category"
-          :items="sortOptions"
-          item-text="label"
-          item-value="value"
-          dense
-          label="分类设置"
-          outlined
-          persistent-placeholder
-        />
-        <v-select
-          v-model="form.deadline"
-          :items="deadline_options"
-          clearable
-          dense
-          label="截止日期"
-          outlined
-          persistent-placeholder
-        />
-        <v-select
-          v-model="form.remind_time"
-          :items="deadline_options"
-          clearable
-          dense
-          label="提醒日期"
-          persistent-placeholder
-          outlined
-        />
-        <v-select
-          v-model="form.repeat_type"
-          :items="repeat_options"
-          clearable
-          dense
-          label="重复"
-          persistent-placeholder
-          outlined
-        />
-        <v-textarea
-          v-model="form.remark"
-          label="备注"
-          clearable
-          persistent-placeholder
-          outlined
-          dense
-          no-resize
-        />
-      </v-form>
-    </side-bar>
+        <v-card-text>
+          <v-img
+            class="mx-auto"
+            width="80"
+            height="80"
+            :src="require('@/assets/empty.png')"
+          ></v-img>
+          <div class="title mt-4">待办列表为空</div>
+        </v-card-text>
+      </v-card>
+    </div>
   </div>
 </template>
 
@@ -181,8 +114,9 @@ import mixin from "@/mixins/store";
 import moment from "moment";
 import MenuButton from "./MenuButton.vue";
 import SideBar from "./SideBar.vue";
+import TaskItem from "./TaskItem.vue";
 export default {
-  components: { MenuButton, SideBar },
+  components: { MenuButton, SideBar, TaskItem },
   mixins: [mixin],
   data() {
     return {
@@ -200,36 +134,16 @@ export default {
       remind_time: "无",
       // 重复类型
       repeat_type: "无",
-      // 菜单选项
-      deadline_options: ["今天", "明天", "下周"],
-      repeat_options: ["每天", "工作日", "每周", "每月", "每年"],
-      //编辑表单
-      form: null,
-      // 防止清空item的名称
-      cache_name: "",
     };
   },
   computed: {
-    // 可选菜单列表
-    sortOptions() {
-      let options = [this.defaultCategory].concat(
-        this.sort_menu.map((item) => {
-          return {
-            label: item.name,
-            value: item.id,
-            icon: item.icon,
-          };
-        })
-      );
-      return options;
+    // 任务列表
+    tasks() {
+      return this.lists(this.active_key);
     },
-    // 显示subtitle 所属分类用的字典 因为绑定的是id
-    menusMap() {
-      let map = {};
-      this.sortOptions.forEach((item) => {
-        map[item.value] = item.label;
-      });
-      return map;
+    // 是否是空的
+    isEmpty() {
+      return this.tasks.every((x) => !x.data.length);
     },
   },
   mounted() {
@@ -259,102 +173,15 @@ export default {
       this.category = this.defaultCategory;
       // TODO 处理接收的所有参数
     },
-    // 强制刷新
-    forceUpdate() {
-      this.refresh = false;
-      this.$nextTick(() => {
-        this.refresh = true;
-      });
-    },
-    // 删除事项
-    deleteItem(id) {
-      this.current_list.splice(
-        this.current_list.findIndex((item) => item.id == id),
-        1
-      );
-    },
-    // 右键菜单
-    onContextmenu(event, item) {
-      if (item.affix) return;
-      let items = [
-        {
-          label: !item.complete ? "标记为完成" : "标记为未完成",
-          icon: `v-icon notranslate mdi ${
-            item.complete ? "mdi-circle-outline" : "mdi-check"
-          }`,
-          onClick: () => {
-            item.complete = !item.complete;
-          },
-        },
-        {
-          label: "删除",
-          icon: "v-icon notranslate mdi mdi-close",
-          onClick: () => {
-            this.deleteItem(item.id);
-          },
-        },
-      ];
-      if (this.sortOptions.length > 1) {
-        items.splice(1, 0, {
-          label: "移动",
-          icon: `v-icon notranslate mdi mdi-apps`,
-          children: this.sortOptions
-            .filter((sort) => sort.value != item.category)
-            .map((sort) => {
-              return {
-                label: sort.label,
-                icon: `v-icon notranslate mdi ${sort.icon}`,
-                onClick: () => {
-                  item.category = sort.value;
-                },
-              };
-            }),
-        });
-      }
-      this.$contextmenu({
-        items,
-        event, // 鼠标事件信息
-        customClass: "custom-class", // 自定义菜单 class
-        zIndex: 999, // 菜单样式 z-index
-        minWidth: 230, // 主菜单最小宽度
-      });
-      return false;
-    },
-    // 选择要编辑的todo
-    selectItem(item) {
-      // 深拷贝对象
-      this.form = item;
-      this.edit_drawer = true;
-    },
-    // 缓存名称
-    getCacheName(event) {
-      this.cache_name = event.target.value;
-    },
-    // 检查名称是否被清空
-    checkName() {
-      if (!this.form.title) {
-        this.form.title = this.cache_name;
-        this.cache_name = "";
-      }
-    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.task-item {
-  background-color: #eee;
-  border-radius: 10px;
-  cursor: pointer;
-  &:hover {
-    background-color: #ccc;
-  }
-}
-.task-item.complete {
-  .v-list-item__title,
-  .v-list-item__subtitle {
-    text-decoration: line-through;
-    color: #ccc;
-  }
+.v-empty {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 </style>

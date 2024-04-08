@@ -2,7 +2,7 @@
  * @Author: 羊驼
  * @Date: 2024-03-28 16:06:38
  * @LastEditors: 羊驼
- * @LastEditTime: 2024-04-03 16:53:08
+ * @LastEditTime: 2024-04-07 16:39:48
  * @Description: file content
  */
 import Vue from "vue";
@@ -39,9 +39,22 @@ export default new Vuex.Store({
         create_time: "2024-03-28 16:43:00",
         category: -1,
       },
+      {
+        id: "3",
+        title: "测试数据2",
+        complete: false,
+        create_time: "2024-03-29 16:43:00",
+        category: -1,
+      },
     ],
     // 编辑框的显示
     edit_drawer: false,
+    // 建议框的显示
+    suggest_drawer: false,
+    // 编辑表单
+    form: null,
+    // 黑暗主题
+    dark: true,
   },
   mutations: {
     // 设置侧边栏显示
@@ -63,6 +76,18 @@ export default new Vuex.Store({
     // 设置编辑栏显示
     setEditDrawer(state, show) {
       state.edit_drawer = show;
+    },
+    // 设置编辑栏显示
+    setSuggestDrawer(state, show) {
+      state.suggest_drawer = show;
+    },
+    // 设置编辑栏显示
+    setForm(state, form) {
+      state.form = form;
+    },
+    // 设置编辑栏显示
+    setDark(state, value) {
+      state.dark = value;
     },
   },
   actions: {},
