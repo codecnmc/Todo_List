@@ -184,4 +184,7 @@ export default {
   top: 50%;
   transform: translate(-50%, -50%);
 }
+.todo::v-deep input {
+  margin-top: 1px;
+}
 </style>

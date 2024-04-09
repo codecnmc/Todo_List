@@ -8,9 +8,7 @@
     <v-list-item-avatar>
       <v-checkbox
         v-model="item.complete"
-        @change="forceUpdate"
         :dark="dark"
-        v-if="refresh"
       />
     </v-list-item-avatar>
     <v-list-item-content>
@@ -48,11 +46,6 @@ export default {
       default: "delete",
     },
   },
-  data() {
-    return {
-      refresh: true,
-    };
-  },
   model: {
     event: "input",
     prop: "value",
@@ -68,13 +61,6 @@ export default {
     },
   },
   methods: {
-    // 强制刷新
-    forceUpdate() {
-      this.refresh = false;
-      this.$nextTick(() => {
-        this.refresh = true;
-      });
-    },
     // 删除事项
     deleteItem(id) {
       this.current_list.splice(
@@ -145,6 +131,3 @@ export default {
   },
 };
 </script>
-
-<style>
-</style>
