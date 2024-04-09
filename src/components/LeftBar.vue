@@ -103,18 +103,20 @@ export default {
     // 检查输出结果
     checkInput(item) {
       let name_set = new Set();
-      let needRename = this.sort_menu.some((list_item) => {
+      let exist = false;
+      this.sort_menu.forEach((list_item) => {
         name_set.add(list_item.name);
-        return item != list_item && list_item.name == item.name;
-      });
-      if (needRename) {
-        let [exist, name, i] = [true, item.name, 1];
-        while (exist) {
-          name = `${item.name}(${i})`;
-          exist = name_set.has(name);
+        if (list_item != item && list_item.name == item.name) {
+          exist = true;
         }
-        item.name = name;
+      });
+      let [name, i] = [item.name, 1];
+      while (exist) {
+        name = `${item.name}(${i++})`;
+        exist = name_set.has(name);
       }
+      item.name = name;
+
       item.edit = false;
       this.$forceUpdate();
     },

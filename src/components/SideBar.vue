@@ -9,7 +9,6 @@
     disable-resize-watcher
     mobile-breakpoint="0"
     v-bind="$attrs"
-    :left="left"
     :right="right"
     clipped
     :fixed="isAbsolute"
@@ -21,7 +20,7 @@
 
 <script>
 export default {
-  props: ["left", "right", "value", "app"],
+  props: ["right", "value", "app"],
   model: {
     prop: "value",
     event: "change",
@@ -31,6 +30,7 @@ export default {
     isAbsolute() {
       return this.width <= 960;
     },
+    // 封装的v-model
     drawer: {
       get() {
         return this.value;
@@ -39,6 +39,7 @@ export default {
         this.$emit("change", value);
       },
     },
+    // 是否是黑暗模式
     dark() {
       return this.$store.state.dark;
     },
@@ -56,9 +57,11 @@ export default {
     // 监听窗口宽度变化
     responseWidth(event) {
       let width = window.innerWidth;
+      // 右侧的小于960的时候要隐藏
       if (this.width != width && width < 960 && this.right) {
         this.drawer = false;
       }
+      // 左侧的大于960要显示出来
       if (this.width != width && width > 960 && !this.right) {
         this.drawer = true;
       }
