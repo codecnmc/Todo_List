@@ -1,5 +1,6 @@
 <template>
   <v-app :class="{dark}">
+
     <v-system-bar
       color="#EFEFEF"
       height="36px"
@@ -9,9 +10,24 @@
       <v-icon>mdi-infinity</v-icon>
       <div class="app-name">Yangtuo To Do</div>
       <v-spacer></v-spacer>
-      <v-icon>mdi-window-minimize</v-icon>
-      <v-icon>mdi-window-maximize</v-icon>
-      <v-icon>mdi-close</v-icon>
+      <v-btn
+        text
+        class="system-btn"
+        x-small
+        @click="invoke('minimize')"
+      ><v-icon>mdi-window-minimize</v-icon></v-btn>
+      <v-btn
+        text
+        class="system-btn"
+        x-small
+        @click="invoke('fullscreen')"
+      > <v-icon>mdi-window-maximize</v-icon></v-btn>
+      <v-btn
+        text
+        class="system-btn"
+        x-small
+        @click="invoke('exit')"
+      > <v-icon>mdi-close</v-icon></v-btn>
     </v-system-bar>
     <!-- 这里使用我们自己封装的drawer 要根据页面宽度去解决侧边栏常驻 -->
     <left-bar />
@@ -25,7 +41,7 @@
         color="transparent"
         flat
         :height="active_key.id==1?'120px':'84px'"
-        class="pt-2 pr-4"
+        class="pr-2"
       >
         <v-toolbar-title>
           <v-app-bar-nav-icon
@@ -65,7 +81,7 @@ import SuggestBar from "./components/SuggestBar.vue";
 import EditBar from "./components/EditBar.vue";
 import moment from "moment";
 moment.locale("zh-cn");
-
+const { ipcRenderer } = require("electron");
 export default {
   mixins: [mixin],
   name: "App",
@@ -80,10 +96,18 @@ export default {
       return moment().format("M月D日 dddd");
     },
   },
+  methods: {
+    invoke(message) {
+      ipcRenderer.invoke(message);
+    },
+  },
 };
 </script>,
 
 <style lang="scss">
+html {
+  overflow-y: hidden !important;
+}
 .task-item {
   background-color: #eee;
   border-radius: 10px;
@@ -105,6 +129,7 @@ export default {
 .edit-drawer {
   z-index: 1001 !important;
 }
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -115,16 +140,29 @@ export default {
   overflow-y: auto;
   overflow-x: hidden;
   background-color: #6478c7;
+
   .v-system-bar {
     z-index: 1002;
+    -webkit-app-region: drag;
+    .system-btn {
+      cursor: pointer;
+      -webkit-app-region: no-drag !important;
+    }
+    .v-icon {
+      font-size: 1rem !important;
+    }
   }
+
   .menu_item_label {
     margin-left: 10px !important;
     font-size: 16px;
   }
   .app-name {
-    font-size: 16px;
+    font-size: 14px;
     user-select: none;
+  }
+  .date {
+    font-size: 14px;
   }
   &.dark {
     .todo .v-input__slot {

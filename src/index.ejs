@@ -1,0 +1,43 @@
+<!--
+ * @Author: 羊驼
+ * @Date: 2024-04-18 10:39:59
+ * @LastEditors: 羊驼
+ * @LastEditTime: 2024-04-18 11:16:07
+ * @Description: file content
+-->
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title><%= htmlWebpackPlugin.options.title %></title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <% if (htmlWebpackPlugin.options.nodeModules) { %>
+    <!-- Add `node_modules/` to global paths so `require` works properly in development -->
+    <script>
+      require('module').globalPaths.push('<%= htmlWebpackPlugin.options.nodeModules.replace(/\\/g, '\\\\') %>')
+    </script>
+    <% } %>
+      <style>
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+      </style>
+</head>
+
+<body>
+  <div id="app"></div>
+  <!-- Set `__static` path to static files in production -->
+  <% if (!process.browser) { %>
+    <script>
+      if (process.env.NODE_ENV !== 'development') window.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
+    </script>
+    <% } %>
+
+      <!-- webpack builds are automatically injected -->
+</body>
+
+</html>
