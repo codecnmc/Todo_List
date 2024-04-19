@@ -6,14 +6,9 @@
  * @Description: file content
  */
 
-if (process.env.NODE_ENV !== "development") {
-  global.__static = require("path").join(__dirname, "/static").replace(/\\/g, "\\\\");
-}
-
 const { app, BrowserWindow, Menu } = require("electron");
 const { ListenerManager } = require("./listener");
 
-const path = require("path");
 const createWindow = () => {
   Menu.setApplicationMenu(null); // null值取消顶部菜单栏
   const win = new BrowserWindow({

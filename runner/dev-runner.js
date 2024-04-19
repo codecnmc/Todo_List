@@ -8,8 +8,8 @@ const webpack = require("webpack");
 const WebpackDevServer = require("webpack-dev-server");
 const webpackHotMiddleware = require("webpack-hot-middleware");
 
-const mainConfig = require("./webpack.main.config");
-const rendererConfig = require("./webpack.renderer.config");
+const mainConfig = require("./dev/webpack.main.config");
+const rendererConfig = require("./dev/webpack.renderer.config");
 
 let electronProcess = null;
 let manualRestart = false;
@@ -79,7 +79,7 @@ function startRenderer() {
 
 function startMain() {
   return new Promise((resolve, reject) => {
-    mainConfig.entry.main = [path.join(__dirname, "../src/main/index.dev.js")].concat(mainConfig.entry.main);
+    mainConfig.entry.main = [path.join(__dirname, "../src/main/index.js")];
     mainConfig.mode = "development";
     const compiler = webpack(mainConfig);
 
